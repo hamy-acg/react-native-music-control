@@ -131,7 +131,6 @@ public class MusicControlNotification {
 
             Intent myIntent = new Intent(context, MusicControlNotification.NotificationService.class);
             context.stopService(myIntent);
-
         }
     }
 
@@ -187,7 +186,6 @@ public class MusicControlNotification {
             return null;
         }
 
-        private boolean isRunning;
         private Notification notification;
 
         @Override
@@ -197,25 +195,11 @@ public class MusicControlNotification {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notification = MusicControlModule.INSTANCE.notification.prepareNotification(MusicControlModule.INSTANCE.nb, false);
                 startForeground(NOTIFICATION_ID, notification);
-                isRunning = true;
             }
-        }
-
-        @Override
-        public int onStartCommand(Intent intent, int flags, int startId) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (intent.getAction() != null && intent.getAction().equals("StopService") && notification != null && isRunning) {
-                    stopForeground(true);
-                    isRunning = false;
-                    stopSelf();
-                }
-            }
-            return START_NOT_STICKY;
         }
 
         @Override
         public void onTaskRemoved(Intent rootIntent) {
-            isRunning = false;
             // Destroy the notification and sessions when the task is removed (closed, killed, etc)
             if (MusicControlModule.INSTANCE != null) {
                 MusicControlModule.INSTANCE.destroy();
@@ -223,13 +207,12 @@ public class MusicControlNotification {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(true);
             }
+
             stopSelf(); // Stop the service as we won't need it anymore
         }
 
         @Override
         public void onDestroy() {
-            isRunning = false;
-
             if (MusicControlModule.INSTANCE != null) {
                 MusicControlModule.INSTANCE.destroy();
             }

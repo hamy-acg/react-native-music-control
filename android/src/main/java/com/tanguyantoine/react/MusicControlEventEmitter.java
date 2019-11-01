@@ -42,7 +42,6 @@ public class MusicControlEventEmitter {
     }
 
     public void onStop() {
-        stopForegroundService();
         sendEvent(context, "stop", null);
     }
 
@@ -76,13 +75,5 @@ public class MusicControlEventEmitter {
 
     public void onVolumeChange(int volume) {
         sendEvent(context, "volume", volume);
-    }
-
-    private void stopForegroundService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent intent = new Intent(context, MusicControlNotification.NotificationService.class);
-            intent.setAction("StopService");
-            ContextCompat.startForegroundService(context, intent);
-        }
     }
 }

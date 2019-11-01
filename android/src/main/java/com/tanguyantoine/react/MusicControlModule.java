@@ -41,7 +41,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
     static MusicControlModule INSTANCE;
 
-    private boolean init = false;
+    private volatile boolean init = false;
     protected MediaSessionCompat session;
 
     private MediaMetadataCompat.Builder md;
@@ -193,10 +193,9 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             context.startForegroundService(myIntent);
-
-        }
-        else
+        } else {
             context.startService(myIntent);
+        }
 
         context.registerComponentCallbacks(this);
 
@@ -524,20 +523,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
     @Override
     public void onTrimMemory(int level) {
-        switch(level) {
-            // Trims memory when it reaches a moderate level and the session is inactive
-            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
-            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
-                if(session.isActive()) break;
 
-                // Trims memory when it reaches a critical level
-            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
-            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
-
-                Log.w(TAG, "Control resources are being removed due to system's low memory (Level: " + level + ")");
-                destroy();
-                break;
-        }
     }
 
     @Override
@@ -547,8 +533,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
     @Override
     public void onLowMemory() {
-        Log.w(TAG, "Control resources are being removed due to system's low memory (Level: MEMORY_COMPLETE)");
-        destroy();
+
     }
 
     public enum NotificationClose {
