@@ -39,6 +39,9 @@ public class MusicControlEventEmitter {
 
     public void onPause() {
         sendEvent(context, "pause", null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            MusicControlNotification.NotificationService.stopForegroundService(false);
+        }
     }
 
     public void onStop() {

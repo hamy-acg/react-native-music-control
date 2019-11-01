@@ -181,6 +181,8 @@ public class MusicControlNotification {
 
     public static class NotificationService extends Service {
 
+        private static NotificationService INSTANCE;
+
         @Override
         public IBinder onBind(Intent intent) {
             return null;
@@ -191,6 +193,8 @@ public class MusicControlNotification {
         @Override
         public void onCreate() {
             super.onCreate();
+
+            INSTANCE = this;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notification = MusicControlModule.INSTANCE.notification.prepareNotification(MusicControlModule.INSTANCE.nb, false);
@@ -208,6 +212,7 @@ public class MusicControlNotification {
                 stopForeground(true);
             }
 
+            INSTANCE = null;
             stopSelf(); // Stop the service as we won't need it anymore
         }
 
@@ -221,7 +226,14 @@ public class MusicControlNotification {
                 stopForeground(true);
             }
 
+            INSTANCE = null;
             stopSelf();
+        }
+        
+        public static synchronized void stopForegroundService(boolean removeNotification) {
+            if (INSTANCE != null) {
+                INSTANCE.stopForeground(removeNotification);
+            }
         }
     }
 }

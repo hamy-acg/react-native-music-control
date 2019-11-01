@@ -373,7 +373,11 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         pb.setBufferedPosition(bufferedTime);
         pb.setActions(controls);
 
+        boolean isPreviouslyPlaying = isPlaying;
         isPlaying = pbState == PlaybackStateCompat.STATE_PLAYING || pbState == PlaybackStateCompat.STATE_BUFFERING;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isPreviouslyPlaying && !isPlaying) {
+            MusicControlNotification.NotificationService.stopForegroundService(false);
+        }
         if(session.isActive()) notification.show(nb, isPlaying);
 
         state = pb.build();
