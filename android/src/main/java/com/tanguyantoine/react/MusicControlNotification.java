@@ -203,6 +203,11 @@ public class MusicControlNotification {
         }
 
         @Override
+        public int onStartCommand(Intent intent, int flags, int startId) {
+            return START_NOT_STICKY;
+        }
+        
+        @Override
         public void onTaskRemoved(Intent rootIntent) {
             // Destroy the notification and sessions when the task is removed (closed, killed, etc)
             if (MusicControlModule.INSTANCE != null) {
