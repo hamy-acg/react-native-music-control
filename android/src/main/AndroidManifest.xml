@@ -1,8 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.tanguyantoine.react">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application>
-        <service android:stopWithTask="true" android:name=".MusicControlNotification$NotificationService" />
+        <service
+            android:name=".MusicControlNotification$NotificationService"
+            android:enabled="true"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -9,14 +9,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.media.MediaBrowserServiceCompat;
+
+import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 
+import java.util.List;
 import java.util.Map;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_MIN;
@@ -179,13 +187,24 @@ public class MusicControlNotification {
         return new NotificationCompat.Action(icon, title, i);
     }
 
-    public static class NotificationService extends Service {
+    public static class NotificationService extends MediaBrowserServiceCompat {
 
         private static NotificationService INSTANCE;
 
         @Override
         public IBinder onBind(Intent intent) {
             return null;
+        }
+
+        @Nullable
+        @Override
+        public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
+            return null;
+        }
+
+        @Override
+        public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
+
         }
 
         private Notification notification;

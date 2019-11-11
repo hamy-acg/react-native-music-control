@@ -3,6 +3,7 @@ package com.tanguyantoine.react;
 import android.app.NotificationManager;
 import android.app.NotificationChannel;
 import android.content.ComponentCallbacks2;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Context;
@@ -15,6 +16,8 @@ import android.media.AudioManager;
 import android.os.SystemClock;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
+
+import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -27,7 +30,6 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
-import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -56,6 +58,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     private MusicControlReceiver receiver;
     private MusicControlEventEmitter emitter;
     private MusicControlAudioFocusListener afListener;
+    private MediaBrowserCompat mediaBrowserCompat;
 
     private Thread artworkThread;
 
@@ -192,7 +195,12 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         afListener = new MusicControlAudioFocusListener(context, emitter, volume);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            context.startForegroundService(myIntent);
+            mediaBrowserCompat = new MediaBrowserCompat(
+                    context,
+                    new ComponentName(context, MusicControlNotification.NotificationService.class),
+                    new MediaBrowserCompat.ConnectionCallback(),
+                    null);
+            mediaBrowserCompat.connect();
         } else {
             context.startService(myIntent);
         }
@@ -229,6 +237,11 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         md = null;
         pb = null;
         nb = null;
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            mediaBrowserCompat.disconnect();
+            mediaBrowserCompat = null;
+        }
 
         init = false;
     }
