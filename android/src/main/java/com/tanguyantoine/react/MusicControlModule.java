@@ -30,6 +30,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
