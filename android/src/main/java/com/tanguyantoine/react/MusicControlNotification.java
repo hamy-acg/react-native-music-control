@@ -223,8 +223,8 @@ public class MusicControlNotification {
                             .INSTANCE
                             .notification
                             .prepareNotification(MusicControlModule.INSTANCE.nb, false);
+                    startForeground(NOTIFICATION_ID, notification);
                 }
-                startForeground(NOTIFICATION_ID, notification);
             }
         }
 
