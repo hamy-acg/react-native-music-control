@@ -21,6 +21,7 @@ import androidx.media.MediaBrowserServiceCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
+
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 
@@ -90,7 +91,7 @@ public class MusicControlNotification {
 
     /**
      * NOTE: Synchronized since the NotificationService called prepare without a re-entrant lock.
-     *       Other call sites (e.g. show/hide in module) are already synchronized.
+     * Other call sites (e.g. show/hide in module) are already synchronized.
      */
     public synchronized Notification prepareNotification(NotificationCompat.Builder builder, boolean isPlaying) {
         // Add the buttons
@@ -216,7 +217,13 @@ public class MusicControlNotification {
             INSTANCE = this;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notification = MusicControlModule.INSTANCE.notification.prepareNotification(MusicControlModule.INSTANCE.nb, false);
+                if (MusicControlModule.INSTANCE != null
+                        && MusicControlModule.INSTANCE.notification != null) {
+                    notification = MusicControlModule
+                            .INSTANCE
+                            .notification
+                            .prepareNotification(MusicControlModule.INSTANCE.nb, false);
+                }
                 startForeground(NOTIFICATION_ID, notification);
             }
         }
@@ -225,7 +232,7 @@ public class MusicControlNotification {
         public int onStartCommand(Intent intent, int flags, int startId) {
             return START_NOT_STICKY;
         }
-        
+
         @Override
         public void onTaskRemoved(Intent rootIntent) {
             // Destroy the notification and sessions when the task is removed (closed, killed, etc)
@@ -253,7 +260,7 @@ public class MusicControlNotification {
             INSTANCE = null;
             stopSelf();
         }
-        
+
         public static synchronized void stopForegroundService(boolean removeNotification) {
             if (INSTANCE != null) {
                 INSTANCE.stopForeground(removeNotification);
