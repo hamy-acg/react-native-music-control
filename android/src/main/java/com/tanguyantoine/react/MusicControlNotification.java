@@ -131,6 +131,7 @@ public class MusicControlNotification {
 
     public synchronized void show(NotificationCompat.Builder builder, boolean isPlaying) {
         NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, prepareNotification(builder, isPlaying));
+        NotificationService.startForegroundService();
     }
 
     public void hide() {
@@ -191,6 +192,7 @@ public class MusicControlNotification {
     public static class NotificationService extends MediaBrowserServiceCompat {
 
         private static NotificationService INSTANCE;
+        private static volatile boolean IS_FOREGROUND_SERVICE;
 
         @Override
         public IBinder onBind(Intent intent) {
@@ -208,24 +210,12 @@ public class MusicControlNotification {
 
         }
 
-        private Notification notification;
-
         @Override
         public void onCreate() {
             super.onCreate();
 
             INSTANCE = this;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (MusicControlModule.INSTANCE != null
-                        && MusicControlModule.INSTANCE.notification != null) {
-                    notification = MusicControlModule
-                            .INSTANCE
-                            .notification
-                            .prepareNotification(MusicControlModule.INSTANCE.nb, false);
-                    startForeground(NOTIFICATION_ID, notification);
-                }
-            }
+            IS_FOREGROUND_SERVICE = false;
         }
 
         @Override
@@ -244,6 +234,7 @@ public class MusicControlNotification {
             }
 
             INSTANCE = null;
+            IS_FOREGROUND_SERVICE = false;
             stopSelf(); // Stop the service as we won't need it anymore
         }
 
@@ -258,7 +249,24 @@ public class MusicControlNotification {
             }
 
             INSTANCE = null;
+            IS_FOREGROUND_SERVICE = false;
             stopSelf();
+        }
+
+        public static synchronized void startForegroundService() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (INSTANCE != null
+                        && MusicControlModule.INSTANCE != null
+                        && MusicControlModule.INSTANCE.notification != null
+                        && !IS_FOREGROUND_SERVICE) {
+                    Notification notification = MusicControlModule
+                            .INSTANCE
+                            .notification
+                            .prepareNotification(MusicControlModule.INSTANCE.nb, false);
+                    INSTANCE.startForeground(NOTIFICATION_ID, notification);
+                    IS_FOREGROUND_SERVICE = true;
+                }
+            }
         }
 
         public static synchronized void stopForegroundService(boolean removeNotification) {
