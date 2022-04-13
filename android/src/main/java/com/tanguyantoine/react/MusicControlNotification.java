@@ -184,7 +184,16 @@ public class MusicControlNotification {
         Intent intent = new Intent(MEDIA_BUTTON);
         intent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
         intent.putExtra(PACKAGE_NAME, packageName);
-        PendingIntent i = PendingIntent.getBroadcast(context, keyCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        
+        
+         int pendingFlags;
+        if (Build.VERSION.SDK_INT >= 23) {
+            pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+        } else {
+            pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+        }
+        PendingIntent i = PendingIntent.getBroadcast(context, keyCode, intent,pendingFlags);
+  
 
         return new NotificationCompat.Action(icon, title, i);
     }
